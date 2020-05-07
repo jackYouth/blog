@@ -57,13 +57,13 @@ function calc1() {
 - 6, 文档解析完毕, 页面重新渲染. 当页面所有 js 同步代码执行完毕后, 触发 DOMContentLoaded 事件.
 - 7, 剩下的 html 文档中的图片资源, js 代码中异步加载的 js, css, 图片资源都加载完毕后, load 事件触发.
 
-#### 总结:
-
-- 1, js 资源会阻止后面 dom 的构建, 但不会影响后面资源的加载.
-- 2, css 资源不会阻碍后面 DOM 的构建, 但会阻碍页面的首次渲染.
-- 3, js 执行之前, 需要等前面的外链 css 加载完毕
-- 4, 当 html 中所有同步加载的 js, css 加载完毕后, 触发 DOMContentLoaded 事件.
-- 5, 当 html 中所有 同步或 js 异步加载的 js, css, 图片加载完毕后, 触发 load 事件. (video、audio、flash 不会影响 load 事件触发。)
+> 总结:
+>
+> - 1, js 资源会阻止后面 dom 的构建, 但不会影响后面资源的加载.
+> - 2, css 资源不会阻碍后面 DOM 的构建, 但会阻碍页面的首次渲染.
+> - 3, js 执行之前, 需要等前面的外链 css 加载完毕
+> - 4, 当 html 中所有同步加载的 js, css 加载完毕后, 触发 DOMContentLoaded 事件.
+> - 5, 当 html 中所有 同步或 js 异步加载的 js, css, 图片加载完毕后, 触发 load 事件. (video、audio、flash 不会影响 load 事件触发。)
 
 ### DOM 渲染原理
 
