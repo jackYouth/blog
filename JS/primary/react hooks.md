@@ -1,5 +1,54 @@
 # react hooks
 
+### 简介
+
+- 从什么时候开始支持的?
+  - 从 16.8.0 开始支持, 使用时, react、react-dom 都必须是 16.8.0 及之后的版本
+- 有哪些 hooks 能做而 class 做不了的
+  - 自定义 hooks, 使组件复用更加灵活
+- 有哪些 hooks 没有覆盖到的 class 的应用场景
+  - getSnapshotBeforeUpdate、getDerivedStateFromError 和 componentDidCatch 等生命周期, 暂时没有等价的 hooks 实现
+  - 一些第三方的库, 可能无法兼容 hooks
+    > redux(v7.1.0 开始)、react-router(v5.1 开始)都已实现 hooks 的支持
+- 项目中推荐使用一个 state 还是多个 state
+  - 通常推荐拆成多个 state, 这样我们在更新其中一个 state 的时候, 不需要通过解构整个 state 来避免其他 state 的丢失
+- 如何只在组件更新时运行 effect?
+  - 定义一个 useRef, 用来标识是否是首次渲染
+- 如何获取上一轮的 state 或 props?
+  - 定义一个 useRef, 再使用一个 useEffect, 在里面将最新的 state 或 props 赋值给这个 ref, 这样每次组件更新时, ref 里是上一次的数据, 更新后, useEffect 中 ref 又会同步更新.
+  - usePrevious 自定义 hooks 的封装:
+    ```js
+    // hooks
+    function usePrevious(value) {
+      const ref = useRef();
+      useEffect(() => {
+        ref.current = value;
+      });
+      return ref.current;
+    }
+    // Counter组件
+    function Counter() {
+      const [count, setCount] = useState(0);
+      const prevCount = usePrevious(count);
+      return (
+        <h1>
+          Now: {count}, before: {prevCount}
+        </h1>
+      );
+    }
+    ```
+
+> react 的特性: state, context, refs ...等
+> react 的工作方式: 组件, props, 自顶向下的数据流
+
+### useState
+
+整个组件的生命周期中只会执行一次, 每一次 set 会触发组件的整体刷新
+
+### useEffect
+
+每次组件刷新时(useState, 或 props 改变), 都会触发. 具体执不执行里面的回调, 要看依赖项是否改变. 依赖项的改变是看前后两个值 === 的比较.
+
 ### useCallback
 
 返回一个 memoized(记忆的)回调函数.<br />
@@ -45,7 +94,7 @@ const reducer = (state, action) => {
     case UPDATE_FOLDER_LIST:
       return {
         ...state,
-        folderList: action.folderList
+        folderList: action.folderList,
       };
     default:
       return state;
@@ -56,9 +105,9 @@ const reducer = (state, action) => {
  * 创建一个MainProvider组件, MainProvider包裹的所有组件都可以访问到value对应的属性
  */
 
-const MainProvider = props => {
+const MainProvider = (props) => {
   const initialState = {
-    folderList: []
+    folderList: [],
   };
   const [state, dispatch] = useReducer(reducer, initialState);
 
