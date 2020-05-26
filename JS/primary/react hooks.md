@@ -37,6 +37,37 @@
       );
     }
     ```
+- 如何测量 dom 节点?
+  - 如果用 useRef 的话, 那么当 ref 值变化的时候, 并不会通知我们
+  - 所以可以考虑 callback ref 的形式, 这样即使子组件延迟显示(点击触发显示)了, 我们仍能在父组件接收到相关信息, 以便更新自组件中的尺寸.
+  ```js
+  function MeasureExample() {
+    const [rect, ref] = useClientRect();
+    return (
+      <>
+        <h1 ref={ref}>Hello, world</h1>
+        {rect !== null && (
+          <h2>The above header is {Math.round(rect.height)}px tall</h2>
+        )}
+      </>
+    );
+  }
+  // 封装一个用于测量元素尺寸的hooks
+  function useClientRect() {
+    const [rect, setRect] = useState(null);
+    const ref = useCallback((node) => {
+      if (node !== null) {
+        setRect(node.getBoundingClientRect());
+      }
+    }, []);
+    return [rect, ref];
+  }
+  ```
+- Effect 等方法的依赖列表中省略函数是否安全?
+  - 一般来说, 是不安全的. 如果省略的这个函数中, 有用到依赖列表中没有的 state, 那么当这个 state 更新的时候, 这个函数是不会主动触发的, 就可能造成数据不是最新的情况.
+  - 正确的做法:
+    - 要么将函数放到 Effect 中, 或是放到组件外, 这样这个函数就不是或不来自组件的 state / props 了.
+    - 将函数放到依赖项中, 使用 useCallback 包裹下这个函数(确保组件不随渲染而改变)
 
 > react 的特性: state, context, refs ...等
 > react 的工作方式: 组件, props, 自顶向下的数据流
@@ -63,13 +94,13 @@ useCallback(fn, deps)相当于 useMemo(() => fn, deps)
 
 ```js
 function FancyInput(props, ref) {
-  const inputRef = useRef();
-  useImperativeHandle(ref, () => ({
-    focus: () => {
-      inputRef.current.focus();
-    }
-  }));
-  return <input ref={inputRef} ... />;
+const inputRef = useRef();
+useImperativeHandle(ref, () => ({
+  focus: () => {
+    inputRef.current.focus();
+  }
+}));
+return <input ref={inputRef} ... />;
 }
 FancyInput = forwardRef(FancyInput);
 ```

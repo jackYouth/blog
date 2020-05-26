@@ -37,41 +37,77 @@ JS 在存储东西时，会将其转成二进制，很多小数在转成二进�
 - 定义：函数 a 内部有个函数 b，函数 b 可以访问到函数 a 中的变量，那么函数 b 就是闭包。闭包存在的意义就是让我们可以间接访问函数内部的变量。
 - 有些人会认为只有函数内部返回一个函数，才能叫做闭包，其实不是，函数内部的函数绑定到 window 下，也可以在外面直接访问到这个函数，从而用到外层函数中定义的变量。
 
-```js
+  ```js
   function A() {
-    let a = 1
-    window.B = function () { console.log(a) }
+    let a = 1;
+    window.B = function () {
+      console.log(a);
+    };
   }
-  A()
-  B() // 1
+  A();
+  B(); // 1
+  ```
 
-  // 面试题：如何解决下面打印出不全是 6
+- 闭包的应用场景
 
-  for (var i = 1; i <= 5; i++) {
-    setTimeout(function timer() { console.log(i) }, i _ 1000)
-  }
-  // 首先，当函数执行的时候，再找 i 的值时，已经变成 6 了，所以打印的时候全是 6
+  - 循环体中, 保存每次循环时的变量
 
-  // 方案 1:
-  for (var i = 1; i <= 5; i++) {
-    function(j) {
-      setTimeout(function timer() { console.log(j) }, j _ 1000)
-    }(i)
-  }
-  // 这种就是就会生成六个自执行的 function，并且通过传参，在函数内部隐式定义一个变量 j = 1 / 2 。。。之类的，当定时器函数执行的时候，往外层找 j 就可以找到函数中保存下来的 j 了
+    ```js
+      // 面试题：如何解决下面打印出不全是 6
+      for (var i = 1; i <= 5; i++) {
+      setTimeout(function timer() { console.log(i) }, 1000)
+      }
+      // 首先，当函数执行的时候，再找 i 的值时，已经变成 6 了，所以打印的时候全是 6
 
-  // 方案 2:
-  for (var i = 1; i <= 5; i++) {
-    setTimeout(function timer(j) { console.log(j) }, i _ 1000, i)
-  }
-  // 定时器的第三个参数，会被当成定时器中函数的参数传进去的
+      // 方案 1:
+      for (var i = 1; i <= 5; i++) {
+      function(j) {
+      setTimeout(function timer() { console.log(j) }, 1000)
+      }(i)
+      }
+      // 这种就是就会生成六个自执行的 function，并且通过传参，在函数内部隐式定义一个变量 j = 1 / 2 。。。之类的，当定时器函数执行的时候，往外层找 j 就可以找到函数中保存下来的 j 了
 
-  // 方案 3：（最推荐）
-  for (let i = 1; i <= 5; i++) {
-    setTimeout(function timer() { console.log(i) }, i _ 1000)
-  }
-  // 通过 let 块会生成一个作用域的方式，来保存住 i
-```
+      // 方案 2:
+      for (var i = 1; i <= 5; i++) {
+      setTimeout(function timer(j) { console.log(j) }, 1000, i)
+      }
+      // 定时器的第三个参数，会被当成定时器中函数的参数传进去的
+
+      // 方案 3：（最推荐）
+      for (let i = 1; i <= 5; i++) {
+      setTimeout(function timer() { console.log(i) }, 1000)
+      }
+      // 通过 let 块会生成一个作用域的方式，来保存住 i
+    ```
+
+  - 模拟私有方法
+
+  ```js
+  var counter = (function () {
+    var privateCounter = 0;
+    function changeBy(val) {
+      privateCounter += val;
+    }
+    return {
+      increment: function () {
+        changeBy(1);
+      },
+      decrement: function () {
+        changeBy(-1);
+      },
+      value: function () {
+        return privateCounter;
+      },
+    };
+  })();
+  console.log(counter.value()); // logs 0
+  counter.increment();
+  counter.increment();
+  console.log(counter.value()); // logs 2
+  counter.decrement();
+  console.log(counter.value()); // logs 1
+  // 这里的increment, decrement, value就是私有方法
+  ```
 
 ### Http 请求
 
@@ -116,14 +152,14 @@ get 和 post 底层都是 TCP/IP，所以从技术上两者能做的事情是一
 ### 模块化：
 
 - 优点：
-  - 1，解决命名冲突
-  - 2，增加复用性
-  - 3，增加可维护性
+- 1，解决命名冲突
+- 2，增加复用性
+- 3，增加可维护性
 - 实现方式：
-  - 1，自执行函数
-  - 2，AMD、CMD
-  - 3，CommonJS
-  - 4，ESModule
+- 1，自执行函数
+- 2，AMD、CMD
+- 3，CommonJS
+- 4，ESModule
 - AMD：<br />
   依赖前置，加载完毕后才能使用，如 requireJs
 - CMD：<br />
@@ -137,14 +173,16 @@ get 和 post 底层都是 TCP/IP，所以从技术上两者能做的事情是一
   > 注意：不能直接给 exports 赋值，因为 exports 是和 module.exports 关联的，如果直接给 exports 赋值，就会改变它在内存中的指向，以后改变 exports 时，就不会同步改变 module.exports 的值，无法完成导出了。
 - require 的基本实现：<br />
   会将引入的 module 包装进一个自执行的函数中。
-  ```js
-  var load = function (module) {
-    var a = 1;
-    module.exports = a;
-    return module.exports;
-  };
-  load(module);
-  ```
+
+```js
+var load = function (module) {
+  var a = 1;
+  module.exports = a;
+  return module.exports;
+};
+load(module);
+```
+
 - ESModule: <br />
   是原生实现的模块化方案，与 CommonJS 有以下区别：
   - 1，CommonJS 支持动态导入，即路径可以是变量，ESModule 暂不支持
