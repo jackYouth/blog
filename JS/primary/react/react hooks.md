@@ -155,3 +155,18 @@ const MainProvider = (props) => {
 const { dispatch, folderList } = useContext(MainContext);
 /****************** MainProvider 包裹的子组件 end ******************/
 ```
+
+### memo
+```js
+function MyComponent(props) {
+  /* 使用 props 渲染 */
+}
+function areEqual(prevProps, nextProps) {
+  /*
+  如果把 nextProps 传入 render 方法的返回结果与
+  将 prevProps 传入 render 方法的返回结果一致则返回 true，
+  否则返回 false
+  */
+}
+export default React.memo(MyComponent, areEqual);
+```
