@@ -72,3 +72,18 @@ type ：用于表明我们这次提交的改动类型，是新增了功能？还
 
 optional scope：一个可选的修改范围。用于标识此次提交主要涉及到代码中哪个模块。
 description：一句话描述此次提交的主要内容，做到言简意赅。
+
+### 进阶
+
+- 查询包含指定内容的分支
+
+  - 查询远程分支中包含<selector>的分支: git branch -r | grep <selector>
+  - 查询全部分支中包含<selector>的分支: git branch -a | grep <selector>
+
+- 查询包含指定内容的 git 提交记录
+  - 按提交者: --author=
+    - 如: git log --author="suyd"
+  - 按 commit 描述: --grep=
+    - 如: git log --grep="suyd"
+  - 按 分支名: --branchName=
+    - 如: git log --branchName="suyd"
