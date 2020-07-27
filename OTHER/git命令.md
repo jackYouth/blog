@@ -87,3 +87,6 @@ description：一句话描述此次提交的主要内容，做到言简意赅。
     - 如: git log --grep="suyd"
   - 按 分支名: --branchName=
     - 如: git log --branchName="suyd"
+  - 查询某文件的提交记录: 
+    - git log filename
+    - git log -p filename 可以先试每次提交的diff
