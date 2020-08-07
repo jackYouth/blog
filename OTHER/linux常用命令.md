@@ -30,7 +30,7 @@ lsof(list open files)是一个列出当前系统打开文件的工具。
 
 ### 杀掉端口占用的进程
 
-kill -9 PID
+kill -9 <PID>
 
 示例:
 比如杀掉刚才的 8000 进程: kill -9 26993
