@@ -8,6 +8,7 @@ const { resolve, basename, extname } = path;
 const ROOT_PATH = resolve("./");
 const OUT_PATH = resolve("./");
 const LOOP_DIRS = ["HTML", "JS", "MongoDB", "Nginx", "Other"];
+const FILTER_DIRS = ["imgs"];
 
 const isDir = (path) => statSync(path).isDirectory();
 const isMdFile = (file) => extname(file) === ".md";
@@ -18,8 +19,12 @@ const creator = (pathname, level) => {
   const files = readdirSync(pathname);
   files.forEach((file) => {
     const filePath = resolve(pathname, file);
-    if (isDir(filePath) && LOOP_DIRS.includes(file)) {
-      text += `\n\n### ${file}`;
+    if (
+      isDir(filePath) &&
+      (LOOP_DIRS.includes(file) || level > 0) &&
+      !FILTER_DIRS.includes(file)
+    ) {
+      text += `\n\n${new Array(level + 2).fill("#").join("")} ${file}`;
       creator(filePath, level + 1);
     } else if (isMdFile(file) && level > 0) {
       text += `\n- [${basename(file, extname(file))}](.${filePath.replace(
