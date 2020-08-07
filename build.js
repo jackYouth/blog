@@ -8,7 +8,7 @@ const { resolve, basename, extname } = path;
 const ROOT_PATH = resolve("./");
 const OUT_PATH = resolve("./");
 const LOOP_DIRS = ["HTML", "JS", "MongoDB", "Nginx", "Other"];
-const FILTER_DIRS = ["imgs"];
+const FILTER_DIRS = ["imgs", "img"];
 const DEFAULT_TEXT = `# blog \n个人技术博客, 不定时更新, 哈哈哈哈~ \n`;
 
 const isDir = (path) => statSync(path).isDirectory();
