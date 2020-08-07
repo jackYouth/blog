@@ -31,7 +31,6 @@
 - Senior
 	- [AST](./JS/Senior/AST.md)
 	- hybrid
-		- img
 		- [index](./JS/Senior/hybrid/index.md)
 	- mobx
 		- [basic](./JS/Senior/mobx/basic.md)
@@ -56,7 +55,6 @@
 		- [1、前言](./JS/Senior/性能优化/1、前言.md)
 		- [2、webpack性能调优和Gzip原理](./JS/Senior/性能优化/2、webpack性能调优和Gzip原理.md)
 		- [README](./JS/Senior/性能优化/README.md)
-		- img
 		- [performance](./JS/Senior/性能优化/performance.md)
 
 ## MongoDB

@@ -15,7 +15,7 @@ const isDir = (path) => statSync(path).isDirectory();
 const isMdFile = (file) => extname(file) === ".md";
 
 const getDirectoryList = (pathname, level) => {
-  return readdirSync(pathname).reduce((p, file) => {
+  return readdirSync(pathname).reduce((list, file) => {
     const filePath = resolve(pathname, file);
     let title, children, type;
     if (
@@ -34,35 +34,35 @@ const getDirectoryList = (pathname, level) => {
       type = "file";
     }
     if (title) {
-      p.push({
+      list.push({
         title,
         children,
         type,
         level,
       });
     }
-    return p;
+    return list;
   }, []);
 };
 
 const directoryList = getDirectoryList(ROOT_PATH, 0);
 
 const getText = (list, defaultText = "") => {
-  return list.reduce((p, c) => {
-    const { title, children, type, level } = c;
+  return list.reduce((content, file) => {
+    const { title, children, type, level } = file;
     if (type === "dir") {
       if (!level) {
-        p += `\n\n## ${title}`;
+        content += `\n\n## ${title}`;
       } else {
-        p += `\n${new Array(level - 1).fill("\t").join("")}- ${title}`;
+        content += `\n${new Array(level - 1).fill("\t").join("")}- ${title}`;
       }
       if (Array.isArray(children) && !!children.length) {
-        p += getText(children);
+        content += getText(children);
       }
     } else {
-      p += `\n${new Array(level - 1).fill("\t").join("")}- ${title}`;
+      content += `\n${new Array(level - 1).fill("\t").join("")}- ${title}`;
     }
-    return p;
+    return content;
   }, defaultText);
 };
 
