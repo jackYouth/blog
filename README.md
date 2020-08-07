@@ -10,12 +10,12 @@
 ### Basic
 - [JS注意细节](./JS/Basic/JS注意细节.md)
 - [JS设计模式](./JS/Basic/JS设计模式.md)
-- [apply&call&bind](./JS/Basic/apply&call&bind.md)
+- [apply_call_bind](./JS/Basic/apply_call_bind.md)
 
 #### backbone学习笔记
 - [02，model实践](./JS/Basic/backbone学习笔记/02，model实践.md)
 - [class中的set、get关键字](./JS/Basic/class中的set、get关键字.md)
-- [cookie&localStorage&sessionStorage](./JS/Basic/cookie&localStorage&sessionStorage.md)
+- [cookie_localStorage_sessionStorage](./JS/Basic/cookie_localStorage_sessionStorage.md)
 
 #### react
 - [Advanced_API](./JS/Basic/react/Advanced_API.md)
