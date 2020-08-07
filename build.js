@@ -32,4 +32,4 @@ const creator = (pathname, level) => {
 
 creator(ROOT_PATH, 0);
 
-writeFileSync(resolve(OUT_PATH, "test.md"), text);
+writeFileSync(resolve(OUT_PATH, "README.md"), text);
