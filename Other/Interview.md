@@ -618,7 +618,7 @@ fiber 将 React 渲染分成两个阶段：Render（接收新数据判断是否�
 - V16.0：改用了对商业使用更加友好的 license 许可、render 支持返回数组和字符串、Error Boundary、- createPortal、支持自定义 Dom 属性、减小文件体积、fiber、提高 SSR 渲染速度
 - V16.1：react-call-return
 - V16.2：Fragment
-- v16.3：生命周期函数更新、createContext、createRef、forwardRef、strictMode
+- v16.3：生命周期函数更新、Context API、createRef、forwardRef、strictMode
 - v16.4：新增指针事件（Pointer Events）、fix 生命周期
 - v16.5：新增调试工具
 - V16.6：memo、lazy、suspense、简化 contextType、增加 getDerivedStateFromError
@@ -679,7 +679,7 @@ redux 的主要组成部分及其本质：
 
 常用的中间件有：redux-thunk（异步 action）、redux-promise-middleware（异步 action）、redux-saga（异步 action）、redux-logger（打日志）
 
-- redux-thunk 的问题就是重复的模版代码太多，在 action creator 里面还要根据异步结果去 dispacth
+- redux-thunk 的问题就是重复的模版代码太多，在 action creator 里面还要根据异步结果去 dispatch
 - redux-promise-middleware 相对而言简洁了一些，直接把异步操作挂在 action 的 payload 属性下面，但是他只是一定程度上简化了 action，并没有改变 reducer。redux-saga 是既不在 action creator 中也不在 reducer 中，他是把副作用（异步行为就是典型的副作用）看成了一个线程，普通的 action 也会触发一个副作用，副作用完成时也会触发 action 作为输出
 
 ### redux 的 API：
@@ -687,6 +687,10 @@ redux 的主要组成部分及其本质：
 createStore、combineReducer、compose、applyMiddleware、bindActionCreators、Provider、connect
 
 ### createStore 做了什么：
+
+createStore(reducer, [initialState], enhancer)
+
+创建一个 Redux store 来存放应用中所有的 state
 
 ### store 的组成：
 
@@ -701,20 +705,28 @@ react-redux 提供了两个重要的对象 Provider 和 connect, 它们是使用
   - 使 React 组件可被连接, 通过使用 Provider 组件将需要有连接 store 能力的组件包裹起来. 一般会将最外层的 routes 进行包裹, 使项目中所有组件都可被连接.
 
   ```js
+  const Root = () => (
+    <Provider store={createStore(reducers, applyMiddleware(thunk))}>
+      <Routes />
+    </Provider>
+  );
   ```
 
 - connect 做了什么:
+
   - 将 React 组件和 Redux store 真正连接起来. 不改变原来的组件, 而是返回一个新的与 redux store 连接的组件
   - 使用: connect([mapStateToProps], [mapDispatchToProps], [mergeProps],[options])([Component])
-    - mapStateToProps: [mapStateToProps(state, [ownProps]): stateProps](Function), 会作为 props 传给 Component. 如果订阅该参数, 任何时候当 store 更新时, mapStateToProps 就会被调用
+
+    - mapStateToProps: [mapStateToProps(state, [ownProps]): stateProps]\(Function), 会作为 props 传给 Component. 如果订阅该参数, 任何时候当 store 更新时, mapStateToProps 就会被调用
       - state 是最新 store
       - ownProps 是传递给组件 Component 的属性, 如果定义了的话, 当传给 Component 的属性改变后, mapStateToProps 会被调用
-    - mapDispatchToProps: [mapDispatchToProps(dispatch, [ownProps]): dispatchProps] (Object or Function), 里面定义的是触发 dispatch action creator 的方法.
+    - mapDispatchToProps: [mapDispatchToProps(dispatch, [ownProps]): dispatchProps] \(Object or Function), 里面定义的是触发 dispatch action creator 的方法.
       - 方法名会作为属性名, 合并到 props 中传递给 Component
-    - mergeProps: [mergeProps(stateProps, dispatchProps, ownProps): props](Function), 这个参数函数中, 可以定制需要传递给组件的 props, 或者把 stateProps 和 dispatchProps 中的特定变量进行绑定.
-    - options: [options](Object), 可以定制 connector 的行为
+    - mergeProps: [mergeProps(stateProps, dispatchProps, ownProps): props]\(Function), 这个参数函数中, 可以定制需要传递给组件的 props, 或者把 stateProps 和 dispatchProps 中的特定变量进行绑定.
+    - options: [options]\(Object), 可以定制 connector 的行为
     - Component: 将要和 redux store 进行连接的组件.
-      > [mapDispatchToProps(dispatch, [ownProps]): dispatchProps] (Object or Function) 这种写法表示, 一个可选参数 mapDispatchToProps, 是一个 Object 或是 Function, function 的话会有两个参数, 第一个是 dispatch 必有, 第二个是 ownProps 可选, 返回值是 dispatchProps
+
+  > [mapDispatchToProps(dispatch, [ownProps]): dispatchProps] (Object or Function) 这种写法表示, 一个可选参数 mapDispatchToProps, 是一个 Object 或是 Function, function 的话会有两个参数, 第一个是 dispatch 必有, 第二个是 ownProps 可选, 返回值是 dispatchProps
 
 ### 什么时候使用 redux：
 
