@@ -234,7 +234,7 @@ load(module);
 - 2，声明一个属性 value，用来保存 resolve、reject 中传入的值
 - 3，内部需要实现两个函数数组 resolvedCallbacks、rejectedCallbacks，用于存储 then 中的回调。因为当执行完 Promise 时状态可能还是等待中，这时应该把 then 中的回调保存起来，当状态改后，再去调用。
 - 4，实现 .then 方法，then 属于 Promise 原型上定义的方法
-  > - [查看代码]('../JS/Senior/MyPromise.js')
+  > - <a href='../JS/Senior/MyPromise.js'>查看代码</a>
   - 参考地址: http://www.cnblogs.com/huansky/p/6064402.html#commentform
   - 总结：Promise 的实际原理就是把通过原型链上的 then 方法，把 then 中的 callback 传到 Promise 函数内部去执行，所以要在函数中实现 callback 的调用，比如：
     `js new MyPromise(resolve => { setTimeout(() => { resolve('resovle success'); }, 1000); })`
