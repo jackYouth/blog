@@ -237,12 +237,18 @@ load(module);
   > - <a href='../JS/Senior/MyPromise.js'>查看代码</a>
   - 参考地址: http://www.cnblogs.com/huansky/p/6064402.html#commentform
   - 总结：Promise 的实际原理就是把通过原型链上的 then 方法，把 then 中的 callback 传到 Promise 函数内部去执行，所以要在函数中实现 callback 的调用，比如：
-    `js new MyPromise(resolve => { setTimeout(() => { resolve('resovle success'); }, 1000); })`
-    Promise 的串联：
-    即在连续的 then 方法中，如何保证第一个 then 方法执行完毕后，再执行第二个 then 方法。
-    就是在当前 then 方法中，最外面包一层 Promise，在当前 then 被执行到之后，再通过包的这层 Promise 的 resolve 方法将下一个 then 方法中的函数执行一下，这样就实现了 Promise 的串联执行（顺序调用）
-    Promise.all 方法：
-    接收一个元素为 Promise 对象的数组作为参数，当所有 promise 状态都已完成之后，才会返回结果。promise 数组中只要有一个失败，all 方法就会烦会失败
+    ```js
+    new MyPromise((resolve) => {
+      setTimeout(() => {
+        resolve("resovle success");
+      }, 1000);
+    });
+    ```
+- Promise 的串联：
+  即在连续的 then 方法中，如何保证第一个 then 方法执行完毕后，再执行第二个 then 方法。
+  就是在当前 then 方法中，最外面包一层 Promise，在当前 then 被执行到之后，再通过包的这层 Promise 的 resolve 方法将下一个 then 方法中的函数执行一下，这样就实现了 Promise 的串联执行（顺序调用）
+- Promise.all 方法：
+  接收一个元素为 Promise 对象的数组作为参数，当所有 promise 状态都已完成之后，才会返回结果。promise 数组中只要有一个失败，all 方法就会烦会失败
 
 ### 浏览器中的进程
 
@@ -264,7 +270,7 @@ load(module);
 - 用户交互事件 (如: 鼠标点击、页面滚动、放大缩小等)
 - 网络请求完成、文件读写完成事件
 
-为了协调宏任务有条不紊的在**主线程**上执行, 页面进程引入了消息队列和事件循环机制, **渲染进程**内部维护了多个消息队列, 比如延迟执行队列和普通的消息队列. 然后主线程采用一个 for 循环, 不断的从这些任务队列中取出任务并执行任务. 我们把这些消息队列中的任务成为宏任务.
+为了协调宏任务有条不紊的在**主线程**上执行, 页面进程引入了消息队列和事件循环机制, **渲染进程**内部维护了多个消息队列, 比如延迟执行队列和普通的消息队列. 然后主线程采用一个 for 循环, 不断的从这些任务队列中取出任务并执行任务. 我们把这些消息队列中的任务称为宏任务.
 
 > V8 引擎是单进程的, 一次只能执行一个宏任务, 一般是先执行页面进程, 再执行渲染进程, 两个不会同时进行
 
@@ -580,7 +586,29 @@ fiber 将 React 渲染分成两个阶段：Render（接收新数据判断是否�
 
 ### history 模式：
 
-使用 history.pushState 和 history.replaceState 改变 URL，html5 的新功能
+- 使用 history.pushState 和 history.replaceState 改变 URL，html5 的新功能
+- 由于这两个方法不会触发 popState 事件, 所以我们要重写 pushState、replaceState 方法. 让其内部去触发 popState, 或是新增两个全局事件
+
+  ```js
+  // 自定义全局事件
+  var _wr = function (type) {
+    var orig = history[type];
+    return function () {
+      var rv = orig.apply(this, arguments);
+      var e = new Event(type);
+      e.arguments = arguments;
+      window.dispatchEvent(e);
+      return rv;
+    };
+  };
+  history.pushState = _wr("pushState");
+  history.replaceState = _wr("replaceState");
+
+  // 使用
+  window.addEventListener("replaceState", function (e) {
+    console.log("THEY DID IT AGAIN! replaceState 111111");
+  });
+  ```
 
 # React v16 新增 API：
 
@@ -603,8 +631,8 @@ fiber 将 React 渲染分成两个阶段：Render（接收新数据判断是否�
 - Fragment：同时返回多个子元素，可以简写为<></>
 - Context API：将数据穿透组件进行传递，不再需要通过 props 一级级传，一定程度上可以替代 redux。它主要分成三块：createContext、Provider、Consumer。React.createContext 接收一个数据的初始值并返回一个带有 Provider 和 Consumer 组件的对象。Provider 是数据的发布方，一般在组件树的上层并接受一个数据的初始值。Consumer 是数据的订阅方，他的 props.children 是一个函数，接受被发布的数据，并返回 react element
 - 生命周期更新：引入了 getDerivedStateFromProps、getSnapshotBeforeUpdate、componentDidCatch 这三个全新的生命周期，将 componentWillMount、componentWillReceiveProps、componentWillUpdate 标记为不安全。
-  - **getDerivedStateFromProps**(nextProps, prevState)将替代 componentWillMount、componentWillReceiveProps，每次 props 更新和 setState 时都会触发该函数。该函数在 API 的设计上采用了静态方法，使其无法访问实例、无法通过 ref 访问 dom 对象，保证了该函数的纯粹高效
-  - **getSnapshotBeforeUpdate**(prevProps, prevState)将替代 componentWillUpdate 会在组件更新之前获取一个 snapshot，并可以计算将计算的值或从 dom 获取的信息传递给 componentDidUpdate(prevProps, prevState, snapshot)的第三个参数，常常用于 scroll 位置的场景下
+  - **getDerivedStateFromProps**(nextProps, prevState)将替代 componentWillMount、componentWillReceiveProps，每次 props 更新和 setState 时都会触发该函数。该函数在 API 的设计上采用了静态方法，使其无法访问实例、无法通过 ref 访问 dom 对象，保证了该函数的纯粹高效. 需要返回值, 返回值为 null 或纯对象, 返回 null 不会触发更新, 返回对象, 则会将该对象 merge 到 state 中并更新
+  - **getSnapshotBeforeUpdate**(prevProps, prevState)将替代 componentWillUpdate 会在组件更新之前获取一个 snapshot，并可以计算将计算的值或从 dom 获取的信息以返回值的形式传递给 componentDidUpdate(prevProps, prevState, snapshot)的第三个参数，常常用于 scroll 位置的场景下
   - **componentDidCatch** 让开发者可以自主的处理错误信息，诸如：错误展示、错误上报等，用户可以创建自己的 Error Boundary 来补货错误
   - **componentWillMount** 被标记不安全是因为在里面获取异步数据或进行事件订阅等操作会产生一些问题
   - **componentWillReceiveProps**/componentWillUpdate 被标记不安全主要因为操作 props 会引起 re-render，并且对 dom 的更新操作也可能导致重新渲染。
@@ -627,7 +655,7 @@ fiber 将 React 渲染分成两个阶段：Render（接收新数据判断是否�
 
 <img src='./imgs/lifecycle.jpg' />
 
-### redux
+# redux
 
 redux 的主要组成部分及其本质：
 
@@ -656,7 +684,7 @@ redux 的主要组成部分及其本质：
 
 ### redux 的 API：
 
-createStore、combineReducer、compose、applyMiddleware、bindActionCreators
+createStore、combineReducer、compose、applyMiddleware、bindActionCreators、Provider、connect
 
 ### createStore 做了什么：
 
@@ -664,9 +692,45 @@ createStore、combineReducer、compose、applyMiddleware、bindActionCreators
 
 state、getState、dispatch、listeners、subscribe
 
+### react-redux
+
+react-redux 提供了两个重要的对象 Provider 和 connect, 它们是使用 react 和 redux 的最佳方式.
+
+- Provider 做了什么
+
+  - 使 React 组件可被连接, 通过使用 Provider 组件将需要有连接 store 能力的组件包裹起来. 一般会将最外层的 routes 进行包裹, 使项目中所有组件都可被连接.
+
+  ```js
+  ```
+
+- connect 做了什么:
+  - 将 React 组件和 Redux store 真正连接起来. 不改变原来的组件, 而是返回一个新的与 redux store 连接的组件
+  - 使用: connect([mapStateToProps], [mapDispatchToProps], [mergeProps],[options])([Component])
+    - mapStateToProps: [mapStateToProps(state, [ownProps]): stateProps](Function), 会作为 props 传给 Component. 如果订阅该参数, 任何时候当 store 更新时, mapStateToProps 就会被调用
+      - state 是最新 store
+      - ownProps 是传递给组件 Component 的属性, 如果定义了的话, 当传给 Component 的属性改变后, mapStateToProps 会被调用
+    - mapDispatchToProps: [mapDispatchToProps(dispatch, [ownProps]): dispatchProps] (Object or Function), 里面定义的是触发 dispatch action creator 的方法.
+      - 方法名会作为属性名, 合并到 props 中传递给 Component
+    - mergeProps: [mergeProps(stateProps, dispatchProps, ownProps): props](Function), 这个参数函数中, 可以定制需要传递给组件的 props, 或者把 stateProps 和 dispatchProps 中的特定变量进行绑定.
+    - options: [options](Object), 可以定制 connector 的行为
+    - Component: 将要和 redux store 进行连接的组件.
+      > [mapDispatchToProps(dispatch, [ownProps]): dispatchProps] (Object or Function) 这种写法表示, 一个可选参数 mapDispatchToProps, 是一个 Object 或是 Function, function 的话会有两个参数, 第一个是 dispatch 必有, 第二个是 ownProps 可选, 返回值是 dispatchProps
+
 ### 什么时候使用 redux：
 
 UI 可以根据应用程序的状态改变、许多不相关的组件以相同的方式更新状态、状态树相对较为复杂、状态以许多不同的方式更新
+
+### redux 的时间旅行功能
+
+时间旅行是 Redux DevTools 提供的一项在调试时可用的功能, 他允许开发者在开发是可以在历史状态中任意回溯的能力, 仅限于开发工具中调试时.
+
+Redux DevTools 的使用:
+
+> 参考链接: [https://juejin.im/post/6844903734502227981](https://juejin.im/post/6844903734502227981)
+
+- 安装对应 chrome 插件
+- 项目中, 通过 window.**REDUX_DEVTOOLS_EXTENSION** , 在 createStore 时将 store 和 Redux DevTools 进行绑定
+- 如果 store 使用了 middleware 和 enhancers 时, 需要对 window.**REDUX_DEVTOOLS_EXTENSION**方法进行兼容, 为了减少重复代码, 我们一般会用 redux-devtools-extension 插件来完成 Redux DevTools 和 store 的绑定
 
 # Vue 框架：
 
