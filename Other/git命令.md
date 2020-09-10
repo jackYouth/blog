@@ -90,3 +90,7 @@ description：一句话描述此次提交的主要内容，做到言简意赅。
   - 查询某文件的提交记录: 
     - git log filename
     - git log -p filename 可以显示每次提交的diff
+
+- 查询某次提交的改动
+  - git show <commitId>
+    - 如果添加 --stat ，则只会显示改动的文件， 不会显示具体的文件改动内容
