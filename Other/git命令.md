@@ -81,16 +81,31 @@ description：一句话描述此次提交的主要内容，做到言简意赅。
   - 查询全部分支中包含<selector>的分支: git branch -a | grep <selector>
 
 - 查询包含指定内容的 git 提交记录
+
   - 按提交者: --author=
     - 如: git log --author="suyd"
   - 按 commit 描述: --grep=
     - 如: git log --grep="suyd"
   - 按 分支名: --branchName=
     - 如: git log --branchName="suyd"
-  - 查询某文件的提交记录: 
+  - 查询某文件的提交记录:
     - git log filename
-    - git log -p filename 可以显示每次提交的diff
+    - git log -p filename 可以显示每次提交的 diff
 
 - 查询某次提交的改动
+
   - git show <commitId>
     - 如果添加 --stat ，则只会显示改动的文件， 不会显示具体的文件改动内容
+
+- rebase（变基）
+  - git rebase --onto <变基目标分支 master> <变基过渡分支 issue1> <变基当前分支 issue2 指令>
+    - 应用场景：从主分支 master 切出了分之 issue1，进行一些提交之后，又有另一个需求，然后在 issue1 的基础之上我们又切出了 issue2 并进行了提交，在这期间又有其他成员对 master 分支做了更新，这时，当我们 issue2 开发完成需要合到 master，但 issue1 因为某些原因导致 delay 需要继续开发。
+    - 对于这种场景，我们就可以使用 rebase，将需要执行变基的 issue2 合并到变基执行的分支 master 并且过滤掉过渡分支 issue1
+  - 与 merge 的区别： rebase 会修整历史，然后将分支历史并入主线，生成一条完成清晰的历史链路，可以理解为美化过的历史。merge 则不会修改历史，让分支历史独立存在，可以看作完整的历史，但是分支删除后，这部分历史就会消失。
+
+- tag (打标签)
+  - tag，中文意思标签，顾名思义就是标记某类事物的一个工具。
+
+### git 的一些坑
+
+- tag 号和 branch 名称相同时（比如都是 test_0_0_0_7 ），当推送分支到远程 test_0_0_0_7 时，会推到 tag 上面
