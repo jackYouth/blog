@@ -84,7 +84,7 @@ description：一句话描述此次提交的主要内容，做到言简意赅。
 
   - 按提交者: --author=
     - 如: git log --author="suyd"
-  - 按 commit 描述: --grep=
+  - 按 commit 描述: --=
     - 如: git log --grep="suyd"
   - 按 分支名: --branchName=
     - 如: git log --branchName="suyd"
@@ -98,6 +98,7 @@ description：一句话描述此次提交的主要内容，做到言简意赅。
     - 如果添加 --stat ，则只会显示改动的文件， 不会显示具体的文件改动内容
 
 - rebase（变基）
+
   - git rebase --onto <变基目标分支 master> <变基过渡分支 issue1> <变基当前分支 issue2 指令>
     - 应用场景：从主分支 master 切出了分之 issue1，进行一些提交之后，又有另一个需求，然后在 issue1 的基础之上我们又切出了 issue2 并进行了提交，在这期间又有其他成员对 master 分支做了更新，这时，当我们 issue2 开发完成需要合到 master，但 issue1 因为某些原因导致 delay 需要继续开发。
     - 对于这种场景，我们就可以使用 rebase，将需要执行变基的 issue2 合并到变基执行的分支 master 并且过滤掉过渡分支 issue1
@@ -105,6 +106,21 @@ description：一句话描述此次提交的主要内容，做到言简意赅。
 
 - tag (打标签)
   - tag，中文意思标签，顾名思义就是标记某类事物的一个工具。
+
+### 实战
+
+- 改变上次提交的 msg
+  - git reset --soft <commitId>
+  - git commit --amend 或 gcmsg <msg> --amend 重新编辑 commitMsg 即可
+- 改变任意一次提交的 msg
+  - git log 查看需要改的 commit 是第几个，比如是第四个
+  - git rebase -i HEAD ～ 4
+  - 把对应的 commit 前面的 pick 改成 e，即可编辑这次提交
+  - git commit --amend ，输入对应的 message
+  - git rebase --continue ， 大功告成
+    > git rebase --abort 可以在任何时机退出 rebase 命令，并回到初始分支
+
+1. 执行 git commit --amend 光标移动到 Change-Id 的行 输入 dd 删除改行 输入:wq 保存退出
 
 ### git 的一些坑
 

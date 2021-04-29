@@ -34,3 +34,11 @@ kill -9 <PID>
 
 示例:
 比如杀掉刚才的 8000 进程: kill -9 26993
+
+### grep
+
+查询内容的命令，比如 grep -ri 'appid' ../atlanta --exclude-dir=node_mo\* ，就是查询上级 atlanta 目录下排除 node_mo 开头文件夹后包含 appid 的文件和内容，递归并忽略大小写
+
+- -r 递归查找
+- -i 忽略大小写
+- --exclude-dir=node_modu\* 忽略以 node_modu 开头的目录
